@@ -1,20 +1,42 @@
-import React, { Fragment } from "react";
+import React, { Fragment,useEffect,useState} from "react";
+import {Redirect} from "react-router-dom";
 import "./Cart.css";
 import CartItemCard from "./CartItemCard";
 import { useSelector, useDispatch } from "react-redux";
-import { addItemsToCart,removeItemsFromCart} from "../../actions/cartAction";
+import { addItemsToCart,removeItemsFromCart,getCartDetails} from "../../actions/cartAction";
 import { Typography } from "@material-ui/core";
 import RemoveShoppingCartIcon from "@material-ui/icons/RemoveShoppingCart";
 import { Link } from "react-router-dom";
+import { addOrderDetails} from "../../actions/orderAction";
 
-const Cart = () =>{
+
+const Cart = ({history}) =>{
  const dispatch = useDispatch();
+ const {isAuthenticated,user} =useSelector(
+  (state) => state.auth
+);
+
+const [formData, setFormData] = useState({
+  subtotal: '1',
+  grosstotal: '1'
+});
+//const successlogin = '';
+const {subtotal,grosstotal} = formData;
+console.log(subtotal);
+console.log(grosstotal);
+const onChange = e => setFormData({ ...formData, [e.target.name] : e.target.value});
+const email=user[0].email;
+useEffect(() => {
+  dispatch(getCartDetails(email));
+}, [dispatch,email]);
  const increaseQuantity = (productid, quantity, stock) => {
     const newQty = quantity + 1;
     if (stock <= quantity) {
       return;
     }
-    dispatch(addItemsToCart(productid, newQty));
+      const email = user[0].email;
+      dispatch(addItemsToCart(productid, newQty,email));
+      dispatch(getCartDetails(email));
   };
 
   const decreaseQuantity = (productid, quantity) => {
@@ -22,17 +44,25 @@ const Cart = () =>{
     if (1 >= quantity) {
       return;
     }
-    dispatch(addItemsToCart(productid, newQty));
+    const email = user[0].email;
+      dispatch(addItemsToCart(productid, newQty,email));
+      dispatch(getCartDetails(email));
   };
 
   const deleteCartItems = (productid) => {
-    dispatch(removeItemsFromCart(productid));
+    const email = user[0].email;
+    dispatch(removeItemsFromCart(productid,email));
+    dispatch(getCartDetails(email));
   };
 
   const { cartItems } = useSelector((state) => state.cart);
+  const checkoutHandler = () => {
+    dispatch(addOrderDetails(email));
+    history.push("/mypurchases");
+  };
     return (
     <Fragment>
-        {cartItems.length === 0 ?(
+        {cartItems.length === 0  ?(
         <div className="emptyCart">
           <RemoveShoppingCartIcon />
 
@@ -68,20 +98,25 @@ const Cart = () =>{
                       +
                     </button>
                 </div>
-                <p className="cartSubtotal">{`${
+                <p className="cartSubtotal">{
+                    item.currency
+                  } {`${
                     item.price * item.quantity
-                  }`}</p>
+                  }`} </p>
                 </div>
                  ))}
                 <div className="cartGrossProfit">
               <div></div>
               <div className="cartGrossProfitBox">
                 <p>Gross Total</p>
-                <p>600</p>
+                <p>{`${cartItems.reduce(
+                  (acc, item) => acc + item.quantity * item.price,
+                  0
+                )}`} </p>
               </div>
               <div></div>
               <div className="checkOutBtn">
-              <button >Check Out</button>
+              <button type="submit" onClick={checkoutHandler}>Check Out</button>
               </div>
               </div>
     </Fragment>)
