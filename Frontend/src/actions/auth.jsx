@@ -7,23 +7,33 @@ import{
     AUTH_ERROR,
     LOGIN_SUCCESS,
     LOGIN_FAIL,
-    LOGOUT
+    LOGOUT,
+    UPDATE_PROFILE_SUCCESS,
+    UPDATE_PROFILE_FAIL,
+    UPDATE_PROFILE_REQUEST,
+    CLEAR_ERRORS,
 } from './types';
-import setAuthToken from '../utils/setAuthToken';
+//import setAuthToken from '../utils/setAuthToken';
 
 export const loadUser = () =>async dispatch => {
-    if(localStorage.token){
-        setAuthToken(localStorage.token);
-    }
+    
     try {
-        const res = await axios.get('/api/auth');
+        // axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
+        const res = await axios.get('http://localhost:5000/api/auth/', {
+            headers: {
+              'authorization': localStorage.getItem('token')
+            }
+          });
+        console.log(res.data.user);
         dispatch({
             type: USER_LOADED,
-            payload: res.data
+            payload: res.data.user,
         });
     } catch (err) {
+        const errors = err.response.data.errors;
+        console.log(errors)
         dispatch({
-            type: AUTH_ERROR
+            type: AUTH_ERROR,
         })
     }
 };
@@ -50,7 +60,6 @@ try{
     })
 }catch(err){
     const errors = err.response.data.errors;
-    console.log(errors);
     if(errors){
         errors.forEach(err => dispatch(setAlert(err.msg)));
     }
@@ -70,33 +79,71 @@ export const login = ({ email, password}) => async dispatch =>{
     localStorage.setItem('email', email);
     try{
         const res = await axios.post('http://localhost:5000/api/users/login',body,config);
+        console.log(res.data);
         if(res.data !== "failure"){
             dispatch({
                 type: LOGIN_SUCCESS,
-                payload: res.data
+                payload: res.data.results,
+                payload1 : res.data.token
             });
             //dispatch(loadUser());
             
          }
          else{
             dispatch({
-                type: LOGIN_FAIL
+                type: LOGIN_FAIL,
             })
             alert("Invalid credentials!");
          }
         
         
     }catch(err){
+        console.log(JSON.stringify(err));
         const errors = err.response.data.errors;
-        console.log(errors);
-        if(errors){
+                if(errors){
             errors.forEach(err => dispatch(setAlert(err.msg)));
         }
-        dispatch({
-            type: LOGIN_FAIL
-        })
+        if(err)
+        {
+            alert("user is not valid");
+    }
     }
     };
 export const logout = () => dispatch => {
     dispatch({type: LOGOUT});
 }
+
+//update user
+
+export const updateProfile = (email,uname,city,mobile,address,dateofbirth,country,gender,picture) => async (dispatch) => {
+    try {
+
+      dispatch({ type: UPDATE_PROFILE_REQUEST });
+  
+      const config = { headers: {  'Content-Type': 'application/json'} };
+      const userData = {
+        uname : uname,
+        email : email,
+        dateofbirth : dateofbirth,
+        mobile : mobile,
+        city : city,
+      country :country,
+        address : address,
+        gender :gender,
+        picture :picture
+      }
+      console.log(userData);
+      const { data } = await axios.post(`http://localhost:5000/api/profile/changeprofile`, userData, config);
+      
+      dispatch({ type: UPDATE_PROFILE_SUCCESS, payload: data.success });
+    } catch (error) {
+      dispatch({
+        type: UPDATE_PROFILE_FAIL,
+        payload: error.response.data.message,
+      });
+    }
+  };
+
+  export const clearErrors = () => async (dispatch) => {
+    dispatch({ type: CLEAR_ERRORS });
+  };

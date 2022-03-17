@@ -112,3 +112,4 @@ Register.propTypes = {
 };
 
 export default connect(null, {setAlert, register})(Register);
+

@@ -8,7 +8,7 @@ import {
   import axios from "axios";
   
   // Adding the productdetails to Cart
-  export const addItemsToCart = (productid,quantity,email) => async (dispatch) => {
+  export const addItemsToCart = (productid,quantity,email,price,shopname) => async (dispatch) => {
     
     const config = {
       headers: {
@@ -19,6 +19,8 @@ import {
       email : email,
       productid :productid,
       quantity: quantity,
+      price : price,
+      shopname : shopname
     }
     const body1 = JSON.stringify(body);
     const {data} = await axios.post("http://localhost:5000/api/profile/addtocart/",body1,config);;
