@@ -1,28 +1,26 @@
-import React from 'react'
+import React,{Fragment} from 'react'
 import {Route,Redirect} from 'react-router-dom'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux';
+import { useSelector } from "react-redux";
 
-const PrivateRoute = ({
-    component:Component,
-    auth:{isAuthenticated, loading}, ...rest}) => (
-   <Route {...rest}
-    render={props=> 
-    !isAuthenticated && !loading ? (
-       <Redirect to='/login'/>
-   ): (
-       <Component {...props}/>
-   ) 
-   }
-   />
-);
-
-PrivateRoute.propTypes = {
-    auth: PropTypes.object.isRequired
-}
-
-const mapStateToProps= state => ({
-    auth:state.auth
-})
-
-export default connect(mapStateToProps)(PrivateRoute);
+const ProtectedRoute = ({  component: Component, ...rest }) => {
+    const { loading, isAuthenticated } = useSelector((state) => state.auth);
+  
+    return (
+      <Fragment>
+        {loading === false && (
+          <Route
+            {...rest}
+            render={(props) => {
+              if (isAuthenticated === false) {
+                return <Redirect to="/login" />;
+              }
+  
+              return <Component {...props} />;
+            }}
+          />
+        )}
+      </Fragment>
+    );
+  };
+  
+  export default ProtectedRoute;

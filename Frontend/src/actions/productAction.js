@@ -10,15 +10,21 @@ import {
 } from "../constants/productConstants";
 
 export const getProduct =
-  () =>
+  (keyword,price=[0,250],sortType='price',outOfStock=0) =>
   async (dispatch) => {
+    //console.log("the one value" +one);
     try {
       dispatch({ type: ALL_PRODUCT_REQUEST });
-      const res = await axios.get('http://localhost:5000/api/profile/getproducts');
-      console.log("received data" + res.data);
+      console.log("the keyword is ", +keyword);
+      //let temp = "temp";
+      console.log("in actions",outOfStock);
+      const body= {min_price:price[0],max_price:price[1],sortType: sortType,outOfStock: outOfStock};
+      const body1 =JSON.stringify(body);
+      const res = await axios.post("http://localhost:5000/api/profile/getSearchDetails/" +keyword,body);
+      console.log("received data" + res.data.results);
       dispatch({
         type: ALL_PRODUCT_SUCCESS,
-        payload: res.data,
+        payload: res.data.results,
       });
     } catch (error) {
       dispatch({
@@ -37,7 +43,7 @@ export const getProduct =
   
       dispatch({
         type: PRODUCT_DETAILS_SUCCESS,
-        payload: data,
+        payload: data.results[0], 
       });
     } catch (error) {
       dispatch({

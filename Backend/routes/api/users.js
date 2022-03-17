@@ -9,10 +9,13 @@ const {check, validationResult} = require('express-validator');
 router.use(cors());
 const User = require('../../models/User');
 const e = require('express');
-
 router.use(express.urlencoded({extended: true}));
 router.use(express.json())
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const {secret} = require('../../utils/config');
+const {auth} = require('../../utils/passport');
+auth();
 //app.use(express.json({extended: false}));
 
 //For route use  GET api/users
@@ -30,10 +33,10 @@ var connection = mysql.createPool({
 
 var connection = mysql.createConnection({
     host: 'localhost',
-    database: 'users_schema',
+    database: 'etsy',
     port: '3306',
     user: 'root',
-    password: 'Git@m123'
+    password: 'password'
 });
 
 
@@ -105,48 +108,37 @@ router.post('/login', [
 
     console.log(req.body);
     const errors = validationResult(req.body);
-    var value = req.body.password;
-    const salt=await bcrypt.genSalt(10);
-    value =await bcrypt.hash(value,salt);
-    console.log(value);
     if(!errors.isEmpty()){
 
         return res.status(500).json({errors: errors.array()});
     }
     const {email,password} = req.body;
     try{  
-        connection.query(`SELECT * FROM users WHERE email=? and password=?`,[email,value
+        connection.query(`SELECT * FROM users WHERE email=?`,[email
     ],  function(error,results){
         if(results.length !== 0){
-            res.send(JSON.stringify(results));
-         }else{
-            res.send("failure");
+            bcrypt.compare(password, results[0].password, function(err, isMatch){
+            if (err) {
+                throw err
+              } else if (!isMatch) {
+                res.send("failure");
+              } else {
+                console.log("in else",results[0].email);
+                const payload = {email : results[0].email};
+                const token = jwt.sign(payload,secret, {
+                 expiresIn: 10080000
+                });
+                res.status(200).send({token: "JWT " + token, results});
+            }
+              })
+            }
+         else{
+            res.status(401).send("invalid credentials");
          }
-        // console.log(results);
-        // if(results.length === 0){
-        //     console.log("hjkloh");
-            
-        //     res.json({errors:[{msg: 'Invalid creds'}]});
-        // }
-        // else{
-        //     res.json(results);
-        // }
-    //   if(error){
-    //          res.writeHead(200, {
-    //              'Content-Type': 'text-plain'
-    //          });
-    //          res.send(error.code);
-    //      }else{
-    //          res.writeHead(200,{
-    //              'Content-Type': 'text/plain'
-    //          });
-    //          //res.send("success");
-    //          res.end(JSON.stringify(results));
-    //      }
      });
     }
     catch(err){
-        res.send("failure")
+        res.status(401).send("failure");
         //console.error(err.message);
         //res.send("server error");
     }

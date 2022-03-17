@@ -50,7 +50,7 @@ export const Login = ({login, isAuthenticated}) => {
     };
 
     if (isAuthenticated) {
-        return <Redirect to="/UserProfile" />;
+        return <Redirect to="/" />;
       }
 
     return (
@@ -118,3 +118,4 @@ const mapStateToProps = state => ({
   });
 
 export default connect(mapStateToProps, {login})(Login);
+
