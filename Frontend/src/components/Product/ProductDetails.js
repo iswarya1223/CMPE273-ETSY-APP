@@ -24,7 +24,6 @@ import _ from "underscore";
    
     const {favproducts} =useSelector((state)=>state.favdetails);
     const favid =_.pluck(favproducts,'productid'); 
-    console.log('iswarya',favid);
       let { productid } = useParams();
       console.log(productid);
       const addToCartHandler = () => {
@@ -42,11 +41,13 @@ import _ from "underscore";
     };
     const email = user && user.length && user[0].email;
       useEffect(() => {
+    
         dispatch(getProductDetails(productid));
+        
         if (email) {
           dispatch(getFavDetails(favkeyword,email));
         }
-      }, [dispatch,productid,email]);
+      }, [dispatch,email]);
       console.log(product)
       const [quantity, setQuantity] = useState(1);
       console.log("quantity is" +quantity);
@@ -106,43 +107,43 @@ import _ from "underscore";
             </div>
             
             <div>
-              <div className="detailsBlock-1">
+            {product && 
+              <><div className="detailsBlock-1">
                 <h2>{product.productname}</h2>
                 <p>Product # {product.productid}</p>
-              </div>
-              <div className="detailsBlock-4">
-               Shopname:
-               <p><Link to={`/shop/${product.shopname}`}>{product.shopname}</Link></p>
-              </div>
-              <div className="detailsBlock-3">
-                <h6><i>sales count: </i>{product.salescount}</h6>
-                <h1>{`${product.currency} ${product.price}`}</h1>
-                <div className="detailsBlock-3-1">
-                  <div className="detailsBlock-3-1-1">
-                    <button onClick={decreaseQuantity}>-</button>
-                    <p>{quantity}</p>
-                    <button onClick={increaseQuantity}>+</button>
+              </div><div className="detailsBlock-4">
+                  Shopname:
+                  <p><Link to={`/shop/${product.shopname}`}>{product.shopname}</Link></p>
+                </div><div className="detailsBlock-3">
+                  <h6><i>sales count: </i>{product.salescount}</h6>
+                  <h6><i>stock availability: </i>{product.stock}</h6>
+                  <h1>{`${product.currency} ${product.price}`}</h1>
+                  <div className="detailsBlock-3-1">
+                    <div className="detailsBlock-3-1-1">
+                      <button onClick={decreaseQuantity}>-</button>
+                      <p>{quantity}</p>
+                      <button onClick={increaseQuantity}>+</button>
+                    </div>
+                    <button
+                      disabled={product.stock < 1 ? true : false}
+                      onClick={addToCartHandler}
+                    >
+                      Add to Cart
+                    </button>
                   </div>
-                  <button
-                    disabled={product.stock < 1 ? true : false}
-                    onClick={addToCartHandler}
-                  >
-                    Add to Cart
-                  </button>
-                </div>
 
-                <p>
-                  Status:
-                  <b className={(product.stock < 1) ? "redcolor" : "greencolor"}>
-                    {(product.stock < 1) ? "OutOfStock" : "InStock"}
-                  </b>
-                </p>
-              </div>
-
-              <div className="detailsBlock-4">
-                Description : <p>{product.description}</p>
-              </div>
+                  <p>
+                    Status:
+                    <b className={(product.stock < 1) ? { color: "redcolor" } : { color: "greencolor" }}>
+                      {(product.stock < 1) ? "OutOfStock" : "InStock"}
+                    </b>
+                  </p>
+                </div><div className="detailsBlock-4">
+                  Description: <p>{product.description}</p>
+                </div></>
+ }
             </div>
+ 
                 </div>
         </Fragment>
     )

@@ -18,7 +18,7 @@ const Search = ({ history }) => {
     <Fragment>
       
       <form className="searchbox" onSubmit={searchSubmitHandler}>
-        <input
+        <input style={{"width":"400px"}}
           type="text"
           placeholder="Search a Product ..."
           onChange={(e) => setKeyword(e.target.value)}

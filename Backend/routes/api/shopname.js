@@ -19,11 +19,11 @@ router.use(express.json())
 
 
 var connection = mysql.createConnection({
-    host: 'localhost',
+    host: 'etsy.cm8fasj2lunx.us-east-2.rds.amazonaws.com',
     database: 'etsy',
     port: '3306',
-    user: 'root',
-    password: 'password'
+    user: 'admin',
+    password: 'password',
 });
 
 
@@ -56,7 +56,7 @@ router.post('/uniqueshopname', [
                        }      
               else{
                 
-                res.status(400).json({success: false});
+                res.status(200).json({success: false});
                   //console.log("Restaurant already existed!");
               }
           });
@@ -231,5 +231,81 @@ router.post('/deleteproductfromshop'
         res.send("server error");
     }
 });
+
+
+router.post('/saveshopimage', [
+    
+  ], async (req,res) => {
+      console.log(req.body);
+      const {shopimage,email} = req.body;
+      try{  
+                  connection.query(`UPDATE users SET shopimage=? where email=? `,[shopimage,email
+                      ],  function(error,results){
+                    if(error){
+    
+                           //res.send(error.code);
+                           res.status(400).json({success: false});
+                       }else{
+                           //res.end(JSON.stringify(results));
+                           res.status(200).json({success: true});
+                       }
+                   });
+              }      
+      catch(err){
+          console.error(err.message);
+          res.send("database error");
+      }
+  }
+  );
+
+  router.post('/getshopcategory', [
+    
+], async (req,res) => {
+    console.log(req.body);
+    const {shopname} = req.body;
+    try{  
+                connection.query(`SELECT category from etsy.categories where shopname = ? or shopname = "NULL" `,[shopname
+                    ],  function(error,results){
+                  if(error){
+  
+                         //res.send(error.code);
+                         res.status(400).json({success: false});
+                     }else{
+                         //res.end(JSON.stringify(results));
+                         res.status(200).json({success: true,results});
+                     }
+                 });
+            }      
+    catch(err){
+        console.error(err.message);
+        res.send("database error");
+    }
+}
+);
+
+router.post('/shopcategory', [
+    
+], async (req,res) => {
+    console.log(req.body);
+    const {shopname,category} = req.body;
+    try{  
+                connection.query(`INSERT INTO categories(shopname,category) values(?,?) `,[shopname,category
+                    ],  function(error,results){
+                  if(error){
+  
+                         //res.send(error.code);
+                         res.status(400).json({success: false});
+                     }else{
+                         //res.end(JSON.stringify(results));
+                         res.status(200).json({success: true});
+                     }
+                 });
+            }      
+    catch(err){
+        console.error(err.message);
+        res.send("database error");
+    }
+}
+);
 
   module.exports = router;

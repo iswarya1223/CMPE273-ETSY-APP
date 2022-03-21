@@ -52,7 +52,7 @@ const FavProduct= ({product,favkeyword,history}) => {
   }
     return (
       <div className = "productCard" onClick={()=> products(product.productid)}>
-      {isAuthenticated && isAuthenticated ? (
+      {isAuthenticated && isAuthenticated && email ? (
       <FaHeart className="card-btn" style={{color: '#cc0000'}} title="Favourites" size="1.5em" 
       onClick={(e) => unfavoriteitems(e,email,product.productid)} />) :<FaRegHeart className="card-btn" style={{color: '#cc0000'}} title="Favourites" size="1.5em" onClick={(e) => 
         favoriteitems(e,email,product.productid)} />}

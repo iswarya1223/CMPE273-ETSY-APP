@@ -23,7 +23,7 @@ import {
       shopname : shopname
     }
     const body1 = JSON.stringify(body);
-    const {data} = await axios.post("http://localhost:5000/api/profile/addtocart/",body1,config);;
+    const {data} = await axios.post("/api/profile/addtocart/",body1,config);;
   
     dispatch({
       type: ADD_TO_CART,
@@ -45,7 +45,7 @@ import {
     }
     const body1 = JSON.stringify(body);
     console.log(body);
-    const {data} = await axios.post("http://localhost:5000/api/profile/getCartDetails",body,config);
+    const {data} = await axios.post("/api/profile/getCartDetails",body,config);
     dispatch({
       type: CART_DETAILS_SUCCESS,
       payload: data,
@@ -71,7 +71,7 @@ import {
     }
     const body1 = JSON.stringify(body);
     console.log(body1);
-    const {data} = await axios.post("http://localhost:5000/api/profile/deletefromcart/",body,config);;
+    const {data} = await axios.post("/api/profile/deletefromcart/",body,config);;
     dispatch({
       type: REMOVE_CART_ITEM,
       payload: data,

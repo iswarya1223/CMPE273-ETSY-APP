@@ -6,13 +6,12 @@ var {secret} = require('./config');
 var mysql = require('mysql');
 
 var connection = mysql.createConnection({
-    host: 'localhost',
+    host: 'etsy.cm8fasj2lunx.us-east-2.rds.amazonaws.com',
     database: 'etsy',
     port: '3306',
-    user: 'root',
-    password: 'password'
+    user: 'admin',
+    password: 'password',
 });
-
 
 connection.connect((err) => {
     if(err){

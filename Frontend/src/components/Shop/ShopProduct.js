@@ -14,7 +14,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { Button } from "@material-ui/core";
 import { useAlert } from "react-alert";
-import {DeleteProduct,getShopDetails,updateProduct} from "../../actions/shopAction";
+import {DeleteProduct,getShopDetails,updateProduct,insertCategory,getCategory} from "../../actions/shopAction";
 import {Modal} from "react-bootstrap";
 import { getProductDetails } from "../../actions/productAction";
 import axios from 'axios';
@@ -53,10 +53,21 @@ const ShopProduct= ({shopproduct,history,shopname}) => {
     const [category, setCategory] = useState("");
     const [image_URL, setImage] = useState("https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true");
     console.log(shopname);    
+    const {categories} = useSelector((state)=>state.categorydetails)
+    const [newcategory,setNewcategory]=useState('');
 
     const updateProductSubmit = (e,productid) => {
       e.preventDefault();
-      dispatch(updateProduct(productid,productname,description,price,stock,currency,category,image_URL,shopname)).then(()=>dispatch(getShopDetails(shopname)));;
+      if (newcategory)
+    {
+      dispatch(insertCategory(shopname,newcategory)).then(()=>dispatch(getCategory(shopname)));
+      dispatch(updateProduct(productid,productname,description,price,stock,currency,newcategory,image_URL,shopname)).then(()=>dispatch(getShopDetails(shopname)))
+      setShow(false);
+    }
+    else{
+      dispatch(updateProduct(productid,productname,description,price,stock,currency,category,image_URL,shopname)).then(()=>dispatch(getShopDetails(shopname)));
+    setShow(false);
+    }
     };
     const uploadImage = async (e) => {
       e.preventDefault()
@@ -127,7 +138,8 @@ const ShopProduct= ({shopproduct,history,shopname}) => {
         <img src={shopproduct.image_URL} alt={shopproduct.productname} />
       <p>{shopproduct.productname}</p>
       <span>{shopproduct.currency} {shopproduct.price}</span>
-      <span><i>total sales count:</i> {shopproduct.salescount}</span>
+      {shopproduct.salescount ? <span><i>total sales count:</i> {shopproduct.salescount}</span> :
+      <span><i>total sales count: </i>0</span>}
         </div>
           }
         <Fragment>
@@ -167,7 +179,7 @@ const ShopProduct= ({shopproduct,history,shopname}) => {
                   </div>
                   <div className="updatedateofbirth">
                     <input
-                      type="number"
+                      type="text"
                       value={price}
                       name='price'
                       placeholder="Product Price"
@@ -204,14 +216,20 @@ const ShopProduct= ({shopproduct,history,shopname}) => {
                       value={category}
                       name='category'
                       onChange={e => setCategory(e.target.value)}>
-                      <option value="null">SelectCategory</option>
-                      <option value="Clothing">Clothing</option>
-                      <option value="Jewellery">Jewellery</option>
-                      <option value="Entertainment">Entertainment</option>
-                      <option value="Home Decor">Home Decor</option>
-                      <option value="Art">Art</option>
+                      {categories && categories.map(categoryname => 
+                        <option value={categoryname.category}>{categoryname.category}</option>
+                        )}
                     </select>
                   </div>
+                  <div>
+                  {category === 'Custom'? <input
+                      type="text"
+                      placeholder="create your own category"  
+                      required
+                      name="category name"
+                      value={newcategory}
+                      onChange={(e) => setNewcategory(e.target.value)} /> : ''}
+                    </div>
                   <div id="updateProfileImage">
                       <input
                         type='file'

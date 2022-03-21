@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-vars */
 import logo from './logo.svg';
 import './App.css';
+import React from 'react';
+//import Reactdom from 'reactdom';
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 import Navbar from './components/layout/Navbar'
 import  Register  from './components/auth/Register';
@@ -57,12 +59,12 @@ const App = () => {
           <ProtectedRoute exact path='/products' component={Products}/>
           <Route path='/products/:keyword' component={Products}></Route>
           <Route exact path='/search' component={Search}></Route>
-          <Route exact path="/cart" component={Cart}></Route>
+          <ProtectedRoute exact path="/cart" component={Cart}/>
           <Route exact path="/login" component={Login} />
-          <Route exact path="/mypurchases" component={Mypurchases} ></Route> 
-          <Route exact path="/EditUser" component={EditUser} />
-          <Route exact path="/shopcreation" component={ShopCreation}></Route>
-          <Route exact path="/shop/:shopname" component={ShopDetails}></Route>
+          <ProtectedRoute exact path="/mypurchases" component={Mypurchases} />
+          <ProtectedRoute exact path="/EditUser" component={EditUser} />
+          <ProtectedRoute exact path="/shopcreation" component={ShopCreation}/>
+          <ProtectedRoute exact path="/shop/:shopname" component={ShopDetails}/>
           <Route exact path="/CreateProduct" component={CreateProduct}></Route>
           <Route exact path="/updateshopproduct/:productid" component={UpdateProduct}></Route>
           <section className='container'>

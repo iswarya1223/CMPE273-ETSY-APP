@@ -25,7 +25,7 @@ export const getFavDetails = (favkeyword,email) => async (dispatch) => {
       email : email
     };  
     const body1 = JSON.stringify(body);
-    const {data} = await axios.post("http://localhost:5000/api/profile/getfavourite",body,config);
+    const {data} = await axios.post("/api/profile/getfavourite",body,config);
     console.log(data);
     dispatch({
       type: FAV_DETAILS_SUCCESS,
@@ -53,7 +53,7 @@ export const getFavDetails = (favkeyword,email) => async (dispatch) => {
       email : email,
     }
     const body1 = JSON.stringify(body);
-    const {data} = await axios.post("http://localhost:5000/api/profile/deletefavourite",body1,config);
+    const {data} = await axios.post("/api/profile/deletefavourite",body1,config);
     console.log(data);
     dispatch({
       type: DELETE_FAV_SUCCESS,
@@ -81,7 +81,7 @@ export const getFavDetails = (favkeyword,email) => async (dispatch) => {
       email : email,
     }
     const body1 = JSON.stringify(body);
-    const {data} = await axios.post("http://localhost:5000/api/profile/addfavourite",body1,config);
+    const {data} = await axios.post("/api/profile/addfavourite",body1,config);
     console.log(data);
     dispatch({
       type: ADD_FAV_SUCCESS,

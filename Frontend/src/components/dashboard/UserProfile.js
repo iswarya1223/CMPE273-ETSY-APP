@@ -1,4 +1,3 @@
-
 /* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { Fragment, useEffect,useState } from "react";
@@ -23,7 +22,7 @@ const UserProfile = ({ history }) => {
       }
       if (email)
       {
-        dispatch(getFavDetails(favkeyword,email));
+        dispatch(getFavDetails(favkeyword,email)); 
       }
     }, [history, isAuthenticated,email]);
     const searchfavproducts = (e) =>
@@ -43,42 +42,41 @@ const UserProfile = ({ history }) => {
           <Loader />
         ) : (
           <Fragment>
-            <MetaData title={`${user[0].uname}'s Profile`} />
-            <div className="profileContainer">
-              <div>
-                <h1>{user[0].uname}</h1>
-                <img src={user[0].picture} alt={user[0].uname} />
-                <Link to="/EditUser">Edit Profile</Link>
-              </div>
-              <div>
-                <div>
-                  <h4>Email</h4>
-                  <p>{user[0].email}</p>
-                </div>
-                <div>
-                  <Link to="/mypurchases">My Orders</Link>
-                </div>
-              </div>
-            </div>
-          <h2 className="homeHeading">Favorite Products</h2>
-          <form >
-        <input
-          type="text"
-          placeholder="Search a FavoriteProduct ..."
-          onChange={(e) => setFavKeyword(e.target.value)}
-        />
-        <input type="submit" value="Search" onClick={searchfavproducts}/>
-      </form>
-          <div className="container" id ="container">
-          {favproducts &&
-              favproducts.map((product) => (
-                <FavProduct product={product} favkeyword={favkeyword} history={history}/>
-              ))}
-            </div>
+          {user && user.length && 
+            <><MetaData title={`${user[0].uname}'s Profile`} /><div className="profileContainer">
+                  <div>
+                    <h1>{user[0].uname}</h1>
+                    <img src={user[0].picture} alt={user[0].uname} />
+                    <Link to="/EditUser">Edit Profile</Link>
+                  </div>
+                  <div>
+                    <div>
+                      <h4>Email</h4>
+                      <p>{user[0].email}</p>
+                    </div>
+                    <div>
+                      <a href="#container">
+                        view Favorite Products
+                      </a>
+                    </div>
+                  </div>
+                </div><h2 className="homeHeading">Favorite Products</h2><form>
+                    <input
+                      type="text"
+                      placeholder="Search a FavoriteProduct ..."
+                      onChange={(e) => setFavKeyword(e.target.value)} />
+                    <input type="submit" value="Search" onClick={searchfavproducts} />
+                  </form><div className="container" id="container">
+                    {favproducts &&
+                      favproducts.map((product) => (
+                        <FavProduct product={product} favkeyword={favkeyword} history={history} />
+                      ))}
+                  </div></>
+}
             </Fragment>
       )}
           </Fragment>
     );
   };
-
+  
   export default UserProfile;

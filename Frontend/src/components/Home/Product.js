@@ -62,10 +62,11 @@ const favkeyword ="undefined";
         <p><b><i>shopname:</i></b> {product.shopname}</p>
         <img src={product.image_URL} alt={product.productname} />
       <p><b><i>productname:</i></b>{product.productname}</p>
-      <p><b><i>sales count:</i></b> {product.salescount}</p>
+      {product.salescount ? <p><b><i>sales count:</i></b> {product.salescount}</p> :
+      <p><b><i>sales count:</i></b> 0</p>}
+      <p><b><i>stock availability:</i></b> {product.stock}</p>
       <span>{product.currency} {product.price}</span>
         </div>
     )
 }
 export default Product;
-

@@ -19,6 +19,11 @@ import {
     UPDATE_PRODUCT_SUCCESS,
     UPDATE_PRODUCT_RESET,
     DELETE_PRODUCT,
+    SAVE_SHOP_IMAGE,
+    CREATE_CATEGORY_FAIL,
+    CREATE_CATEGORY_SUCCESS,
+    GET_CATEGORY_FAIL,
+    GET_CATEGORY_SUCCESS,
 } from "../constants/shopConstants";
 
 export const uniqueshopReducer = (state = { shopname : null}, action) => {
@@ -80,7 +85,7 @@ export const createshopReducer = (state = {}, action) => {
   }
 };
 
-export const shopDetailsReducer = (state = { shopdetails: [], shopsalesrevenue :[] }, action) => {
+export const shopDetailsReducer = (state = { shopdetails: [], shopsalesrevenue :[],shopimagestatus:[] }, action) => {
   switch (action.type) {
     case SHOP_DETAILS_REQUEST:
       return {
@@ -98,7 +103,11 @@ export const shopDetailsReducer = (state = { shopdetails: [], shopsalesrevenue :
         loading: false,
         error: action.payload,
       };
-
+      case SAVE_SHOP_IMAGE:
+        return {
+          loading: false,
+          shopimagestatus:action.payload
+        }
     case CLEAR_ERRORS:
       return {
         ...state,
@@ -180,6 +189,43 @@ export const updateProductReducer = (state = {isupdated : null, delete_product: 
       };
 
 
+    case CLEAR_ERRORS:
+      return {
+        ...state,
+        error: null,
+      };
+
+    default:
+      return state;
+  }
+};
+
+export const shopcategory = (state = {categories:[],insertcategory:[]}, action) => {
+  switch (action.type) {
+    case CREATE_CATEGORY_SUCCESS:
+      return {
+        ...state,
+        loading: true,
+        insertcategory: action.payload,
+      };
+    case CREATE_CATEGORY_FAIL:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+
+    case GET_CATEGORY_FAIL:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+      case GET_CATEGORY_SUCCESS:
+        return {
+          ...state,
+          categories: action.payload
+        }
     case CLEAR_ERRORS:
       return {
         ...state,

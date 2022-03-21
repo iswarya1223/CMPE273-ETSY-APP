@@ -11,7 +11,7 @@ import _ from 'underscore';
 const Products = ({history}) => {
     const dispatch = useDispatch();
     //const price = 'price';
-    const [price, setPrice] = useState([0,250]);
+    const [price, setPrice] = useState([0,10000]);
     const [sortType, setSortType] = useState('price');
     const [outOfStock, setoutOfStock] = useState(0);
     const {user} = useSelector((state)=>state.auth)
@@ -91,7 +91,7 @@ return(
               valueLabelDisplay="auto"
               aria-labelledby="range-slider"
               min={0}
-              max={100}
+              max={10000}
             /> </div>
   </Fragment>);}
 

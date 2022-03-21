@@ -73,7 +73,7 @@ export const Register = ({setAlert, register}) => {
             <label htmlFor="password"><b>Password</b></label>
             <input  className='form-control' 
                         type="password" 
-                        placeholder="min8chars@6" 
+                        placeholder="min6chars" 
                         name="password"
                         value={password}
                         onChange={e => onChange(e)}
@@ -85,7 +85,7 @@ export const Register = ({setAlert, register}) => {
             <label htmlFor="confpassword"><b>Confirm Password</b></label>
             <input  className='form-control' 
                         type="password" 
-                        placeholder="min8chars@6" 
+                        placeholder="min6chars" 
                         name="confpassword"
                         value={confpassword}
                         onChange={e => onChange(e)}
@@ -112,4 +112,3 @@ Register.propTypes = {
 };
 
 export default connect(null, {setAlert, register})(Register);
-

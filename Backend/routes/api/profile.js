@@ -21,11 +21,11 @@ const {checkAuth} = require("../../utils/passport");
 
 
 var connection = mysql.createConnection({
-    host: 'localhost',
+    host: 'etsy.cm8fasj2lunx.us-east-2.rds.amazonaws.com',
     database: 'etsy',
     port: '3306',
-    user: 'root',
-    password: 'password'
+    user: 'admin',
+    password: 'password',
 });
 
 
@@ -264,11 +264,11 @@ router.post('/getCartDetails'
 router.post('/orders'
   , async (req,res) => {
     console.log("emails is",req.body);
-    const {email} = req.body;
+    const {email,totalprice} = req.body;
     try{   
            // inserting into orders 
-            connection.query(`Insert into orders(email,orderdate) values(?,?)`,[email,
-            new Date().toISOString().slice(0, 10)],function(error,results){
+            connection.query(`Insert into orders(email,orderdate,totalprice) values(?,?,?)`,[email,
+            new Date().toISOString().slice(0, 10),totalprice],function(error,results){
                 console.log(results)});
                 // getting the products from cart table based on user name
             connection.query(`SELECT  productid,quantity,price,shopname from cart where email = ?`,email,function(error,results){
@@ -279,7 +279,7 @@ router.post('/orders'
             for ( let i =0;i<results.length;i++) {
                 //var productid = results[i].productid
                 // inserting into the orderdetails table by looping over the products in the cart
-                  connection.query(`Insert into orderdetails(productid,quantity,orderid,price,shopname) values(?,?,?,?,?)`,[results[i].productid,results[i].quantity,orderid,results[i].price,results[i].shopname],function(error2,results2){
+                  connection.query(`Insert into orderdetails(productid,quantity,orderid,price,shopname,totalprice) values(?,?,?,?,?,?)`,[results[i].productid,results[i].quantity,orderid,results[i].price,results[i].shopname,totalprice],function(error2,results2){
                     //var i;
                     console.log("printing i",i);
                     // to get the sales count variable and update the stock/quantity in the products table
@@ -295,7 +295,21 @@ router.post('/orders'
                     
             })})}})})
             // deleting data from cart table.
-            connection.query(`Delete from cart where email = ?`, email)
+            connection.query(`Delete from cart where email = ?`, email,function(error,result)
+            {
+                if(error) 
+                {
+                    res.status(400).json({
+                        success: false,
+                      });
+                }
+                else{
+                    res.status(200).json({
+                        success: true,
+                      });
+                }
+                    
+            })
 
             
          }
@@ -314,7 +328,7 @@ router.post('/mypurchases'
     try{   
        
             connection.query(`SELECT  P.productid , P.productname ,P.currency, P.shopname , P.image_URL,OD.quantity,OD.price,
-            O.orderid , O.orderdate from etsy.products P , etsy.orders O , etsy.orderdetails OD
+            O.orderid , O.orderdate,OD.totalprice from etsy.products P , etsy.orders O , etsy.orderdetails OD
             where O.email = ?  AND P.productid IN ( select OD.productid from etsy.orderdetails 
             where OD.orderid IN (select O.orderid from etsy.orders))`,email,  function(error,results){
             console.log(results);

@@ -16,7 +16,13 @@ import {
     UPDATE_PRODUCT_REQUEST,
     UPDATE_PRODUCT_SUCCESS,
     UPDATE_PRODUCT_FAIL,
-    DELETE_PRODUCT
+    DELETE_PRODUCT,
+    SAVE_SHOP_IMAGE,
+    CREATE_CATEGORY_SUCCESS,
+    CREATE_CATEGORY_FAIL,
+    GET_CATEGORY_SUCCESS,
+    GET_CATEGORY_FAIL,
+
 } from "../constants/shopConstants";
 
 // chekcing the shopname is created or not
@@ -28,7 +34,7 @@ export const getShopAvailability =
       const body = {
           shopname : keyword
       }
-      const {data} = await axios.post('http://localhost:5000/api/shopname/uniqueshopname',body);
+      const {data} = await axios.post('/api/shopname/uniqueshopname',body);
       console.log("received data" + data.success);
       if (data.success) {
         dispatch({
@@ -58,7 +64,7 @@ export const getShopAvailability =
           email : email
       }
       console.log(body);
-      const {data} = await axios.post('http://localhost:5000/api/shopname/createshop',body);
+      const {data} = await axios.post('/api/shopname/createshop',body);
       console.log("received data" + data.success);
       dispatch({
         type: CREATE_SHOP_SUCCESS,
@@ -78,7 +84,7 @@ export const getShopAvailability =
     try {
       dispatch({ type: SHOP_DETAILS_REQUEST });
       console.log("action shop",shopname);
-      const {data} = await axios.get("http://localhost:5000/api/shopname/getShopDetails/"+shopname);
+      const {data} = await axios.get("/api/shopname/getShopDetails/"+shopname);
 
       dispatch({
         
@@ -112,7 +118,7 @@ export const getShopAvailability =
         shopname :shopname,
       }
       console.log(productData);
-      const { data } = await axios.post(`http://localhost:5000/api/shopname/createproduct`, productData, config);
+      const { data } = await axios.post(`/api/shopname/createproduct`, productData, config);
   
       dispatch({ type: CREATE_PRODUCT_SUCCESS, payload: data.success });
     } catch (error) {
@@ -139,7 +145,7 @@ export const getShopAvailability =
         image_URL : image_URL ,
       }
       console.log(productData);
-      const { data } = await axios.post(`http://localhost:5000/api/shopname/updateproduct`, productData, config);
+      const { data } = await axios.post(`/api/shopname/updateproduct`, productData, config);
   
       dispatch({ type: UPDATE_PRODUCT_SUCCESS, payload: data.success });
     } catch (error) {
@@ -161,12 +167,70 @@ export const getShopAvailability =
     }
     const body1 = JSON.stringify(body);
     console.log(body1);
-    const {data} = await axios.post("http://localhost:5000/api/shopname/deleteproductfromshop/",body,config);;
+    const {data} = await axios.post("/api/shopname/deleteproductfromshop/",body,config);;
     dispatch({
       type: DELETE_PRODUCT,
       payload: data.success,
     });
   };
+
+
+  export const saveShopImage = (shopimage,email) => async (dispatch) => {
+    const config = {
+      headers: {
+          'Content-Type': 'application/json'
+      }
+  }
+    const body = {
+      shopimage :shopimage,
+      email:email,
+    }
+    const body1 = JSON.stringify(body);
+    console.log(body1);
+    const {data} = await axios.post("/api/shopname/saveshopimage/",body,config);
+      dispatch({
+        type: SAVE_SHOP_IMAGE,
+        payload: data.success,
+      });
+    };
+
+    export const insertCategory = (shopname,category) => async (dispatch) => {
+      try {
+    
+        const config = { headers: {  'Content-Type': 'application/json'} };
+        const productData = {
+          shopname : shopname,
+          category :category,
+        }
+        const { data } = await axios.post(`/api/shopname/shopcategory`, productData, config);
+    
+        dispatch({ type: CREATE_CATEGORY_SUCCESS, payload: data.success });
+      } catch (error) {
+        dispatch({
+          type: CREATE_CATEGORY_FAIL,
+          payload: error.response.data.message,
+        });
+      }
+    };
+
+    export const getCategory = (shopname) => async (dispatch) => {
+      try {
+    
+        const config = { headers: {  'Content-Type': 'application/json'} };
+        const productData = {
+          shopname : shopname,
+        }
+        const { data } = await axios.post(`/api/shopname/getshopcategory`, productData, config);
+    
+        dispatch({ type: GET_CATEGORY_SUCCESS, payload: data.results });
+      } catch (error) {
+        dispatch({
+          type: GET_CATEGORY_FAIL,
+          payload: error.response.data.message,
+        });
+      }
+    };
+
   export const clearErrors = () => async (dispatch) => {
     dispatch({ type: CLEAR_ERRORS });
   };
