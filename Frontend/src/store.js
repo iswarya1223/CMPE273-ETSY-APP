@@ -9,7 +9,7 @@ import {productsReducer,
 import {authReducer,profileReducer} from "./reducers/auth";
 import {alert} from "./reducers/alert";
 import { cartReducer } from './reducers/cartReducer';
-import { uniqueshopReducer,createshopReducer,shopDetailsReducer,createProductReducer, updateProductReducer } from './reducers/shopReducer';
+import { uniqueshopReducer,createshopReducer,shopDetailsReducer,createProductReducer, updateProductReducer,shopcategory } from './reducers/shopReducer';
 import { orderReducer } from './reducers/orderReducer';
 
 const middleware = [thunk];
@@ -28,6 +28,7 @@ const reducer = combineReducers({
   updateproduct : updateProductReducer,
   getorder : orderReducer,
   favdetails : favproductsReducer,
+  categorydetails: shopcategory,
 });
 
 let initialState = {};

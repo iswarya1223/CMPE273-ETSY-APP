@@ -32,11 +32,11 @@ var connection = mysql.createPool({
 */
 
 var connection = mysql.createConnection({
-    host: 'localhost',
+    host: 'etsy.cm8fasj2lunx.us-east-2.rds.amazonaws.com',
     database: 'etsy',
     port: '3306',
-    user: 'root',
-    password: 'password'
+    user: 'admin',
+    password: 'password',
 });
 
 
@@ -51,7 +51,7 @@ connection.connect((err) => {
 router.post('/', [
   check('uname', 'Name is required').not().isEmpty(),
   check('email', 'Please enter a valid email').isEmail(),
-  check('password','please enter more chars').isLength({min: 6}),
+  check('password','password should be minimum of length 6 charcaters').isLength({min: 6}),
 ], async (req,res) => {
     console.log(req.body);
     const errors = validationResult(req);

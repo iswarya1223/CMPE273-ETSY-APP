@@ -7,7 +7,7 @@ import {
 import axios from "axios";
   
   // Adding the productdetails to Cart
-  export const addOrderDetails = (email)  => async (dispatch) => {
+  export const addOrderDetails = (email,totalprice)  => async (dispatch) => {
     
     const config = {
       headers: {
@@ -16,9 +16,10 @@ import axios from "axios";
   }
     const body = {
       email : email,
+      totalprice:totalprice
     }
     const body1 = JSON.stringify(body);
-    const {data} = await axios.post("http://localhost:5000/api/profile/orders/",body1,config);;
+    const {data} = await axios.post("/api/profile/orders/",body1,config);;
   
     dispatch({
       type: ADD_ORDER_DETAILS,
@@ -28,6 +29,7 @@ import axios from "axios";
 
   // getting the user order details
   export const getOrderDetails = (email)  => async (dispatch) => {
+    console.log('check');
     try {
     const config = {
       headers: {
@@ -37,11 +39,12 @@ import axios from "axios";
     const body = {
       email : email,
     }
+    console.log(body);
     dispatch({
       type: ORDER_DETAILS_REQUEST,
     })
     const body1 = JSON.stringify(body);
-    const {data} = await axios.post("http://localhost:5000/api/profile/mypurchases/",body1,config);
+    const {data} = await axios.post("/api/profile/mypurchases/",body1,config);
   
     dispatch({
       type: ORDER_DETAILS_SUCCESS,

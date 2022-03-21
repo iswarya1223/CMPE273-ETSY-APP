@@ -8,7 +8,7 @@ var cors = require('cors');
 var multer =require('multer');
 app.use(cors());
 //require('../Utils/passport');
-app.get('/',(req,res) => res.send('API Running'));
+//app.get('/',(req,res) => res.send('API Running'));
 
 app.use(session({
      secret: 'mysql',
@@ -29,10 +29,10 @@ var connection = mysql.createPool({
 });
 */
 var connection = mysql.createConnection({
-    host: 'localhost',
+    host: 'etsy.cm8fasj2lunx.us-east-2.rds.amazonaws.com',
     database: 'etsy',
     port: '3306',
-    user: 'root',
+    user: 'admin',
     password: 'password',
 });
 
@@ -42,6 +42,9 @@ connection.connect((err) => {
     }
     console.log("pool created");
 });
+
+app.use(express.static(__dirname + '/public'));
+
 
 app.get('/test_api',async function(req,res){
     await connection.query('SELECT * from users', async function(error,results){
@@ -86,7 +89,16 @@ app.use('/api/posts', require('./routes/api/posts'));
 app.use('/api/shopname', require('./routes/api/shopname'));
 //app.use('/api/restaurant', require('./routes/api/restaurant'));
 
+app.get('*', function (req, res) {
+    res.sendFile(`${__dirname}/public/index.html`, (err) => {
+      if (err) {
+        console.log(err);
+        res.end(err.message);
+      }
+    });
+  });
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+

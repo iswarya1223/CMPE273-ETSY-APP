@@ -5,7 +5,7 @@ import { useParams, Redirect} from "react-router-dom";
 import Carousel from "react-material-ui-carousel";
 import { useSelector, useDispatch } from "react-redux";
 import { useAlert } from "react-alert";
-import {getShopDetails} from "../../actions/shopAction";
+import {getCategory, getShopDetails, insertCategory} from "../../actions/shopAction";
 import Loader from "../layout/Loader/Loader";
 import { Link } from "react-router-dom";
 import ShopProduct from './ShopProduct';
@@ -13,6 +13,8 @@ import { Modal, Button } from "react-bootstrap";
 import { createProduct } from "../../actions/shopAction"
 import { Image } from 'cloudinary-react'
 import axios from 'axios';
+import {saveShopImage} from '../../actions/shopAction';
+import { loadUser } from "../../actions/auth";
 //import "./Profile.css";
 
 
@@ -27,12 +29,16 @@ const ShopDetails = ({ history }) => {
       let { shopname } = useParams();
       const{loading,shopdetails,shopsalesrevenue} = useSelector((state)=>state.shopdetail);
       const{user} =useSelector((state) =>state.auth);
-      const shopimage1 =user && user.length && user[0].shopimage;
-      console.log(shopimage1);
+      const email =user && user.length && user[0].email;
+      const {categories} = useSelector((state)=>state.categorydetails)
       useEffect(() => {
-        dispatch(getShopDetails(shopname));
+        if(shopname)
+        {
+        dispatch(getShopDetails(shopname))
+        dispatch(getCategory(shopname));
+        }
         console.log("shop",shopsalesrevenue);
-      }, [])
+      }, [shopname])
 
       const uploadImage = async (e) => {
         e.preventDefault()
@@ -51,6 +57,16 @@ const ShopDetails = ({ history }) => {
         })
       }
       
+      const { error, isUpdated } = useSelector((state) => state.createproduct);
+  const [productname, setProductName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [stock, setStock] = useState("");
+  const [currency, setCurrency] = useState("");
+  const [category, setCategory] = useState("");
+  const [image_URL, setImage] = useState("https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true");
+  const [shopimage,setShopImage] = useState('');
+  const [newcategory,setNewcategory]=useState('');
       const uploadShopImage = async (e) => {
         e.preventDefault()
         // console.log('image',image);
@@ -67,21 +83,25 @@ const ShopDetails = ({ history }) => {
           setShopImage(res.data.secure_url)
         })
       }
-     
-  const { error, isUpdated } = useSelector((state) => state.createproduct);
-  const [productname, setProductName] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [stock, setStock] = useState("");
-  const [currency, setCurrency] = useState("");
-  const [category, setCategory] = useState("");
-  const [image_URL, setImage] = useState("https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true");
-  const [shopimage,setShopImage] = useState('');
+      useEffect(() => {
+        if (shopimage) {
+          dispatch(saveShopImage(shopimage,email)).then(()=>dispatch(loadUser())).then(()=>dispatch(getShopDetails(shopname)));
+        }},[shopimage])
+
   //const shopname = user && user.length && user[0].shopname;
   console.log(shopname);    
   const updateProfileSubmit = (e) => {
     e.preventDefault();
-    dispatch(createProduct(productname,description,price,stock,currency,category,image_URL,shopname)).then(()=>dispatch(getShopDetails(shopname)));
+    if (newcategory)
+    {
+      dispatch(insertCategory(shopname,newcategory)).then(()=>dispatch(createProduct(productname,description,price,stock,currency,newcategory,image_URL,shopname))).then(()=>dispatch(loadUser())).then(()=>dispatch(getShopDetails(shopname))).then(()=>dispatch(getCategory(shopname)));
+      setShow(false);
+    }
+    else{
+    dispatch(createProduct(productname,description,price,stock,currency,category,image_URL,shopname)).then(()=>dispatch(loadUser())).then(()=>dispatch(getShopDetails(shopname))).then(()=>dispatch(getCategory(shopname)));
+    setShow(false);
+    }
+
   };
     return (
     
@@ -92,23 +112,28 @@ const ShopDetails = ({ history }) => {
 
             <div>
               <h2>{shopname}</h2>
-              <div>
-                {shopname === user[0].shopname ?
+              <div id="updateProfileImage">
+                
 
-                  <><Image
-                    style={{ height: 80, width: 100, marginBottom: 20 }}
+                 <Image
+                    style={{ height: 160, width: 160, marginBottom: 20 }}
                     cloudName='dj3in4dua'
-                    public_id={shopimage} /><input
+                    public_id={shopdetails[0].shopimage}/>
+                    {shopname === user[0].shopname ?
+                    <input
                       type='file'
                       className='form-control'
                       name='userName'
                       onChange={(e) => uploadShopImage(e)}
-                    ></input></> : ''}
+                    ></input> : ''}
               </div>
+              <div>
+              <br></br>
               {shopname === user[0].shopname ?
                 <Button variant="primary" onClick={handleShow}>
-                  Create product
+                  Create New Product
                 </Button> : ''}
+                </div>
             </div>
             <div>
               <div>
@@ -127,7 +152,9 @@ const ShopDetails = ({ history }) => {
 
               </div>
               <div>
-                <Link to="/viewshopProducts">view Shop Products</Link>
+                <a href="#container">
+               view Shop Products
+               </a>
               </div>
             </div>
 
@@ -168,7 +195,7 @@ const ShopDetails = ({ history }) => {
                     </div>
                     <div className="updatedateofbirth">
                       <input
-                        type="number"
+                        type="text"
                         value={price}
                         name='price'
                         placeholder="Product Price"
@@ -205,14 +232,27 @@ const ShopDetails = ({ history }) => {
                         value={category}
                         name='category'
                         onChange={e => setCategory(e.target.value)}>
-                        <option value="null">SelectCategory</option>
-                        <option value="Clothing">Clothing</option>
-                        <option value="Jewellery">Jewellery</option>
-                        <option value="Entertainment">Entertainment</option>
-                        <option value="Home Decor">Home Decor</option>
-                        <option value="Art">Art</option>
+                        {categories && categories.map(categoryname => 
+                        <option value={categoryname.category}>{categoryname.category}</option>
+                        )}
                       </select>
+                      </div>
+                      <div>
+                      {category === 'Custom'? <input
+                      type="text"
+                      placeholder="Add your own category"  
+                      required
+                      name="category name"
+                      value={newcategory}
+                      onChange={(e) => setNewcategory(e.target.value)} /> : ''}
                     </div>
+                    {image_URL && (
+        <Image className="img"
+          style={{ height: 80, width: 100, marginBottom: 20 }}
+          cloudName='dj3in4dua'
+          public_id={image_URL}
+        />
+      )}
                     <div id="updateProfileImage">
                       <input
                         type='file'

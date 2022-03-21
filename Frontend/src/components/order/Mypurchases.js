@@ -17,7 +17,10 @@ export const Mypurchases = ({history}) =>
     const dispatch = useDispatch();
     const alert = useAlert();
     useEffect(() => {
+      if(email)
+      {
         dispatch(getOrderDetails(email));
+      }
       }, [dispatch,email]);
 
       const orderHandler = () => {

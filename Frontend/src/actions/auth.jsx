@@ -19,7 +19,7 @@ export const loadUser = () =>async dispatch => {
     
     try {
         // axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5000/api/auth/', {
+        const res = await axios.get('/api/auth/authentication', {
             headers: {
               'authorization': localStorage.getItem('token')
             }
@@ -47,7 +47,7 @@ const config = {
 const body = JSON.stringify({uname, email, password,location});
 
 try{
-    const res = await axios.post('http://localhost:5000/api/users',body,config);
+    const res = await axios.post('/api/users',body,config);
     if(res.data==='failure'){
         alert("user already existed");
     }
@@ -78,7 +78,7 @@ export const login = ({ email, password}) => async dispatch =>{
     const body = JSON.stringify({ email, password});
     localStorage.setItem('email', email);
     try{
-        const res = await axios.post('http://localhost:5000/api/users/login',body,config);
+        const res = await axios.post('/api/users/login',body,config);
         console.log(res.data);
         if(res.data !== "failure"){
             dispatch({
@@ -133,7 +133,7 @@ export const updateProfile = (email,uname,city,mobile,address,dateofbirth,countr
         picture :picture
       }
       console.log(userData);
-      const { data } = await axios.post(`http://localhost:5000/api/profile/changeprofile`, userData, config);
+      const { data } = await axios.post(`/api/profile/changeprofile`, userData, config);
       
       dispatch({ type: UPDATE_PROFILE_SUCCESS, payload: data.success });
     } catch (error) {

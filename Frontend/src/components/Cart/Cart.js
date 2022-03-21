@@ -16,6 +16,7 @@ const Cart = ({history}) =>{
   (state) => state.auth
 );
 const alert = useAlert();
+const [totalprice,setTotalPrice]=useState('');
 const [formData, setFormData] = useState({
   subtotal: '1',
   grosstotal: '1'
@@ -26,9 +27,25 @@ console.log(subtotal);
 console.log(grosstotal);
 const onChange = e => setFormData({ ...formData, [e.target.name] : e.target.value});
 const email=user && user.length && user[0].email;
+const { cartItems } = useSelector((state) => state.cart);
 useEffect(() => {
+  if (email)
+  {
   dispatch(getCartDetails(email));
+
+  }
+  
 }, [dispatch,email]);
+useEffect(() => {
+  if(cartItems)
+  {
+    setTotalPrice(cartItems.reduce(
+      (acc, item) => acc + item.quantity * item.price,
+      0
+    ))
+  }
+},[cartItems]);
+
  const increaseQuantity = (productid, quantity, stock,price,shopname) => {
     const newQty = quantity + 1;
     if (stock <= quantity) {
@@ -44,22 +61,30 @@ useEffect(() => {
     if (1 >= quantity) {
       return;
     }
-    const email = user[0].email;
+    const email = user && user.length && user[0].email;
+    if (email)
+    {
       dispatch(addItemsToCart(productid, newQty,email,price,shopname)).then(()=> dispatch(getCartDetails(email)));
      // dispatch(getCartDetails(email));
+    }
   };
 
   const deleteCartItems = (productid) => {
-    const email = user[0].email;
+    const email = user && user.length && user[0].email;
+    if (email)
+    {
     dispatch(removeItemsFromCart(productid,email)).then(()=> dispatch(getCartDetails(email)));
+    }
   };
 
-  const { cartItems } = useSelector((state) => state.cart);
-  const checkoutHandler = () => {
+  
+  const checkoutHandler = (totalprice) => {
     console.log(user);
     if(user && user.length && user[0].address)
   {
-    dispatch(addOrderDetails(email));
+
+    dispatch(addOrderDetails(email,totalprice));
+
     alert.success("order is placed successfully")
     dispatch(getOrderDetails(email)).then(() => history.push("/mypurchases"));
   }else{
@@ -69,7 +94,7 @@ useEffect(() => {
   };
     return (
     <Fragment>
-        {cartItems.length === 0  ?(
+        {cartItems && cartItems.length === 0  ?(
         <div className="emptyCart">
           <RemoveShoppingCartIcon />
 
@@ -118,14 +143,11 @@ useEffect(() => {
               <div></div>
               <div className="cartGrossProfitBox">
                 <p>Gross Total</p>
-                <p>{`${cartItems.reduce(
-                  (acc, item) => acc + item.quantity * item.price,
-                  0
-                )}`} </p>
+                <p >{cartItems && cartItems[0].currency}{totalprice} </p>
               </div>
               <div></div>
               <div className="checkOutBtn">
-              <button type="submit" onClick={checkoutHandler}>Check Out</button>
+              <button type="submit" onClick={()=>checkoutHandler(totalprice)}>Check Out</button>
               </div>
               </div>
     </Fragment>)

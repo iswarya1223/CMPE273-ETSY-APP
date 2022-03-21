@@ -6,7 +6,7 @@ import DashboardIcon from "@material-ui/icons/Dashboard";
 import PersonIcon from "@material-ui/icons/Person";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import ListAltIcon from "@material-ui/icons/ListAlt";
-import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
+import {MdOutlineLocalMall} from "react-icons/md";
 import { useHistory } from "react-router-dom";
 import { useAlert } from "react-alert";
 //import { logout } from "../../../actions/userAction";
@@ -19,7 +19,7 @@ const UserOptions = ({user}) => {
     const options = [
         { icon: <PersonIcon />, name: "Profile", func: account },
         { icon: < ListAltIcon/>, name: "Orders", func: orders },
-        { icon: < ShoppingCartIcon/>, name: "shopcreation", func: shop}];
+        { icon: < MdOutlineLocalMall/>, name: "shopcreation", func: shop}];
         function account() {
             history.push("/userProfile");
           }
@@ -29,7 +29,7 @@ const UserOptions = ({user}) => {
         }
         function shop()
         {
-          if (user[0].shopname === null){
+          if (user && user.length && user[0].shopname === null){
 
           history.push("/shopcreation")}
           else  {
@@ -49,7 +49,7 @@ return (
         icon={
             <img
               className="speedDialIcon"
-              src={user[0].picture ? user[0].picture : "https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true"}
+              src={user && user.length && user[0].picture ? user[0].picture : "https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true"}
               alt="Profile"
             />
           }
